@@ -25,6 +25,10 @@ class CucumberJsJsonReporter extends reporter_1.default {
             this.options.language = constants_1.DEFAULT_LANGUAGE;
             log.info(`The 'language' was not set, it has been set to the default '${constants_1.DEFAULT_LANGUAGE}'`);
         }
+        if (this.options.reportFilePerRetry === undefined) {
+            this.options.reportFilePerRetry = constants_1.DEFAULT_REPORT_FILE_PER_RETRY;
+            log.info(`The 'reportFilePerRetry' was not set, it has been set to the default '${constants_1.DEFAULT_REPORT_FILE_PER_RETRY.toString()}'`);
+        }
         this.instanceMetadata = null;
         this.report = {};
         this.registerListeners();
@@ -83,8 +87,9 @@ class CucumberJsJsonReporter extends reporter_1.default {
     }
     onRunnerEnd() {
         const uniqueId = String(Date.now() + Math.random()).replace('.', '');
+        const filename = this.options.reportFilePerRetry ? `${this.report.feature.id}_${uniqueId}.json` : `${this.report.feature.id}.json`;
         const jsonFolder = (0, path_1.resolve)(process.cwd(), this.options.jsonFolder);
-        const jsonFile = (0, path_1.resolve)(jsonFolder, `${this.report.feature.id}_${uniqueId}.json`);
+        const jsonFile = (0, path_1.resolve)(jsonFolder, filename);
         const json = [this.report.feature];
         const output = (0, fs_extra_1.existsSync)(jsonFile) ? json.concat((0, fs_extra_1.readJsonSync)(jsonFile)) : json;
         (0, fs_extra_1.outputJsonSync)(jsonFile, output);

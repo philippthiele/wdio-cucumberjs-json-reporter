@@ -203,7 +203,7 @@ describe('reporter', () => {
             expect((0, fileExists_1.fileExists)(jsonFolder)).toEqual(true);
             (0, fs_extra_1.removeSync)(jsonFolder);
         });
-        it('should create unique Json file and should not add in existing Json file onRunnerEnd', () => {
+        it('should by default create a unique Json file and should not add in existing Json file onRunnerEnd', () => {
             const jsonFolder = './.tmp/ut-folder';
             tmpReporter.report.feature = { id: 'this-feature' };
             tmpReporter.options.jsonFolder = jsonFolder;
@@ -218,6 +218,20 @@ describe('reporter', () => {
                 expect((0, fs_extra_1.readJsonSync)(path_1.default.resolve(jsonFolder, jsonFile)).length)
                     .toEqual(1);
             }
+            (0, fs_extra_1.removeSync)(jsonFolder);
+        });
+        it('should be able to add json to an existing json output when reportFilePerRetry option is set to false', () => {
+            const jsonFolder = './.tmp/ut-folder';
+            const jsonFile = `${jsonFolder}/this-feature.json`;
+            (0, fs_extra_1.copySync)('lib/tests/__mocks__/mock.json', jsonFile);
+            tmpReporter.report.feature = { id: 'this-feature' };
+            tmpReporter.options.jsonFolder = jsonFolder;
+            tmpReporter.options.reportFilePerRetry = false;
+            expect((0, fs_extra_1.readJsonSync)(jsonFile).length).toEqual(1);
+            tmpReporter.onRunnerEnd();
+            const files = (0, fs_extra_1.readdirSync)(jsonFolder);
+            expect(files.length).toEqual(1);
+            expect((0, fs_extra_1.readJsonSync)(jsonFile).length).toEqual(2);
             (0, fs_extra_1.removeSync)(jsonFolder);
         });
     });
